@@ -14,8 +14,6 @@ static Window *channels_window;
 // You have more control than with a simple menu layer
 static MenuLayer *channels_menu_layer;
 
-// You can draw arbitrary things in a menu item such as a background
-static GBitmap *channels_menu_background;
 
 // A callback is used to specify the amount of sections of menu items
 // With this, you can dynamically add and remove sections
@@ -74,8 +72,6 @@ void channels_menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index,
 // This initializes the menu upon window load
 void channels_window_load(Window *window) {
  
-  // And also load the background
-  channels_menu_background = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_BRAINS);
 
   // Now we prepare to initialize the menu layer
   // We need the bounds to specify the menu layer's viewport size
@@ -108,8 +104,6 @@ void channels_window_unload(Window *window) {
   menu_layer_destroy(channels_menu_layer);
 
 
-  // And cleanup the background
-  gbitmap_destroy(channels_menu_background);
     
     
     for(int i=0; i<numberOfChannels;i++)

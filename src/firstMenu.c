@@ -20,14 +20,11 @@ static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 static SimpleMenuItem second_menu_items[NUM_SECOND_MENU_ITEMS];
 
-// Menu items can optionally have icons
-static GBitmap *menu_icon_image;
 
 
 
 int currentlySelected = 0;
 
-// You can capture when the user selects a menu icon with a menu item select callback
 static void menu_select_callback(int index, void *ctx) {
     currentlySelected = index; 
     if(index==0)  {
@@ -39,9 +36,6 @@ static void menu_select_callback(int index, void *ctx) {
 
 // This initializes the menu upon window load
 static void window_load(Window *window) {
-  // We'll have to load the icon before we can use it
-  menu_icon_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_MENU_ICON_SECTOR_WATCH);
-
 
   first_menu_items[0] = (SimpleMenuItem){
     // You should give each menu item a title and callback
@@ -89,9 +83,6 @@ static void window_load(Window *window) {
 // Deinitialize resources on window unload that were initialized on window load
 void window_unload(Window *window) {
   simple_menu_layer_destroy(simple_menu_layer);
-
-  // Cleanup the menu icon
-  gbitmap_destroy(menu_icon_image);
 }
 
 int main(void) {

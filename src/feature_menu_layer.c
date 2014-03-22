@@ -14,8 +14,6 @@ static Window *advancedMenuWindow;
 // You have more control than with a simple menu layer
 static MenuLayer *menu_layer;
 
-// You can draw arbitrary things in a menu item such as a background
-static GBitmap *menu_background;
 
 // A callback is used to specify the amount of sections of menu items
 // With this, you can dynamically add and remove sections
@@ -74,9 +72,6 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
 // This initializes the menu upon window load
 void advancedlist_window_load(Window *window) {
  
-  // And also load the background
-  menu_background = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_BRAINS);
-
   // Now we prepare to initialize the menu layer
   // We need the bounds to specify the menu layer's viewport size
   // In this case, it'll be the same as the window's
@@ -107,9 +102,6 @@ void advancedlist_window_unload(Window *window) {
   // Destroy the menu layer
   menu_layer_destroy(menu_layer);
 
-
-  // And cleanup the background
-  gbitmap_destroy(menu_background);
     
     
     for(int i=0; i<numberOfItemsInCurrentMenu;i++)
