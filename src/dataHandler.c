@@ -9,9 +9,37 @@ void out_sent_handler(DictionaryIterator *sent, void *context) {
    // outgoing message failed
  }
 
+ void in_received_handler(DictionaryIterator *received, void *context) {  
+	 APP_LOG(APP_LOG_LEVEL_DEBUG, "Got some message from phone");
+   
+	 Tuple *numberOfItemsTuple = dict_find(received, 1);
+	 int numberOfItems = 0;
+	 
+	 Tuple *currentItemTuple = dict_find(received, 2);
+	 int currentItem = 0;
 
- void in_received_handler(DictionaryIterator *received, void *context) {
-   // incoming message received
+	 if (numberOfItemsTuple) {
+		 numberOfItems = numberOfItemsTuple->value->uint16;
+		 APP_LOG(APP_LOG_LEVEL_DEBUG, "numberOfItemsTuple: %d", numberOfItems); 
+	 }
+	 
+	 if (currentItemTuple) {
+		 currentItem = currentItemTuple->value->uint16;
+		 
+
+		 Tuple *titleTuple = dict_find(received, 10+currentItem);
+		 char *title = "";
+		 Tuple *subTitleTuple = dict_find(received, 11+currentItem);
+		 char *subTitle = "";
+		 
+		 if(titleTuple) {
+			 title = titleTuple->value->cstring;
+		 }
+		 if(subTitleTuple) {
+			 subTitle = subTitleTuple->value->cstring;
+		 }
+		 APP_LOG(APP_LOG_LEVEL_DEBUG, "item  %s: %s", title, subTitle); 
+	 }
  }
 
 

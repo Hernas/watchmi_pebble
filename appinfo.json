@@ -1,9 +1,7 @@
 {
     "versionLabel": "1.0",
     "uuid": "795fcdaa-6184-4e53-a23c-c46dd76efafa",
-    "appKeys": {
-        "load": 0
-    },
+    "appKeys": {},
     "longName": "Watchmi Pebble",
     "versionCode": 1,
     "capabilities": [

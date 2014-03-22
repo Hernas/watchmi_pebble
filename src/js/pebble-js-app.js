@@ -7,6 +7,39 @@ Pebble.addEventListener("ready",
 );
 
 
+var sendItem = function(index, title, subtitle) {
+    console.log('sendItem '+index);
+    index = index*2;
+	var data = {};
+	data[2] = index;
+	data[10+index] = title;
+	data[11+index] = subtitle;
+	console.log('Data to send: '+JSON.stringify(data));
+	Pebble.sendAppMessage(data);
+};
+
+var sendResultsToPebble = function(data) {
+	var dataToSend = {
+		1: data.length
+	};
+	
+	console.log('Data to send: '+JSON.stringify(dataToSend));
+	
+var transactionId = Pebble.sendAppMessage( dataToSend,
+  function(e) {
+    console.log("Successfully delivered message with transactionId=" + e.data.transactionId);
+	for(var i =0; i<data.length; i++) {
+        sendItem(i, data[i][0], data[i][1]);
+	}
+  },
+  function(e) {
+    console.log("Unable to deliver message with transactionId="+ e.data.transactionId + " Error is: " + JSON.stringify(e));
+  }
+);
+	console.log("Sending message, transactionId="+transactionId);
+};
+
+
 var fetchData = function(type) {
 	if(typeof type == "undefined") {
 		type = 0;
@@ -23,20 +56,13 @@ var fetchData = function(type) {
 	console.log('Loading "'+url+'"');
   req.open('GET', url, true);
   req.onload = function(e) {
+	console.log('Loaded with status: '+req.status+', ready state: '+req.readyState);
     if (req.readyState == 4 && req.status == 200) {
       if(req.status == 200) {
         var response = JSON.parse(req.responseText);
-		console.log(JSON.stringify(response));
+		console.log('Got '+response.totalResults+' results');
+		sendResultsToPebble([['title', 'subtitle'], ['2title', 'subtitle']]);
         
-	/*var transactionId = Pebble.sendAppMessage( { "0": 42, "1": "String value" },
-  function(e) {
-    console.log("Successfully delivered message with transactionId=" + e.data.transactionId);
-  },
-  function(e) {
-    console.log("Unable to deliver message with transactionId="+ e.data.transactionId + " Error is: " + e.error.message);
-  }
-);
-console.log("Sending message, "+transactionId);*/
       } else { console.log("Error"); }
     }
   };
@@ -47,6 +73,6 @@ console.log("Sending message, "+transactionId);*/
 Pebble.addEventListener("appmessage",
   function(e) {
     console.log("Received message: " + JSON. stringify (e.payload));
-	fetchData(e.payload.load);
+	fetchData(e.payload[0]);
   }
 );
