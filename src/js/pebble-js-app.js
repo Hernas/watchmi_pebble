@@ -5,19 +5,42 @@ Pebble.addEventListener("ready",
     console.log("JavaScript app ready and running!");
   }
 );
+var itemsToSend;
 
 
-var sendItem = function(index, title, subtitle) {
-    console.log('sendItem '+index);
-    index = index*2;
-	var data = {};
+var sendNextItem = function(index, type) {
+    if(itemsToSend.length>index) {
+        var title = itemsToSend[index][0];
+        var subtitle = itemsToSend[index][1];
+        console.log('sendItem: '+index+' type: '+type);
+        
+        
+    var data = {};
 	data[2] = index;
-	data[10+index] = title;
-	data[11+index] = subtitle;
+    
+        if(type===0) {
+            data[3] = title;
+        } 
+        if(type===1) {
+            data[4] = subtitle;
+        } 
 	console.log('Data to send: '+JSON.stringify(data));
-	Pebble.sendAppMessage(data);
+        Pebble.sendAppMessage(data, function() {
+            var typeToSend = type?0:1;
+            sendNextItem(index+type, typeToSend);
+        }, function() {
+            console.log('Item '+index+' fucked');
+            sendNextItem(index, type);
+        });
+    } else {
+        
+        Pebble.sendAppMessage({"5": 1}, function() {
+            console.log('End sent');
+        }, function() {
+            console.log('End fucked');
+        });
+    }
 };
-
 var sendResultsToPebble = function(data) {
 	var dataToSend = {
 		1: data.length
@@ -28,9 +51,8 @@ var sendResultsToPebble = function(data) {
 var transactionId = Pebble.sendAppMessage( dataToSend,
   function(e) {
     console.log("Successfully delivered message with transactionId=" + e.data.transactionId);
-	for(var i =0; i<data.length; i++) {
-        sendItem(i, data[i][0], data[i][1]);
-	}
+	itemsToSend = data;
+    sendNextItem(0, 0);
   },
   function(e) {
     console.log("Unable to deliver message with transactionId="+ e.data.transactionId + " Error is: " + JSON.stringify(e));
@@ -38,8 +60,23 @@ var transactionId = Pebble.sendAppMessage( dataToSend,
 );
 	console.log("Sending message, transactionId="+transactionId);
 };
+var formatDate = function(time) {
+    var date = new Date(time*1000);
+// hours part from the timestamp
+var hours = ("0"+date.getHours()).substr(0,2);
+// minutes part from the timestamp
+var minutes = ("0"+date.getMinutes()).substr(0,2);
 
-
+// will display time in 10:30:23 format
+    return hours + ':' + minutes;
+};
+var getDataForItem = function(item) {
+    //console.log('Parsing item: '+JSON.stringify(item));
+    
+    var subtitle = 'Start: '+formatDate(item.epgData.time.strt);
+    subtitle += ' End: '+formatDate(item.epgData.time.end);
+    return [item.epgData.tit[0].value.substr(0, 15), subtitle];
+};
 var fetchData = function(type) {
 	if(typeof type == "undefined") {
 		type = 0;
@@ -61,13 +98,18 @@ var fetchData = function(type) {
       if(req.status == 200) {
         var response = JSON.parse(req.responseText);
 		console.log('Got '+response.totalResults+' results');
-		sendResultsToPebble([['title', 'subtitle'], ['2title', 'subtitle']]);
+          var items = [];
+          for(var i=0; i<response.results.length && i<20; i++) {
+              items.push(getDataForItem(response.results[i]));
+          }
+		sendResultsToPebble(items);
         
       } else { console.log("Error"); }
     }
   };
   req.send(null);
 };
+
 
 
 Pebble.addEventListener("appmessage",

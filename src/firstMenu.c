@@ -1,5 +1,6 @@
 	#include "pebble.h"
 	#include "dataHandler.h"
+    #include "feature_menu_layer.h"
 
 #define NUM_MENU_SECTIONS 1
 #define NUM_FIRST_MENU_ITEMS 2
@@ -43,6 +44,9 @@ static void menu_select_callback(int index, void *ctx) {
 
 
   layer_mark_dirty(simple_menu_layer_get_layer(simple_menu_layer));
+}
+void watchme_data_loaded(int count, char **titles, char **subTitles) {
+    open_advanced_menu(count, titles, subTitles);
 }
 
 // This initializes the menu upon window load

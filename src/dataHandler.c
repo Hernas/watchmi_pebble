@@ -1,4 +1,7 @@
-#include "pebble.h"
+    #include "pebble.h"
+    #include "dataHandler.h"
+    #include "string.h"
+    
 
 void out_sent_handler(DictionaryIterator *sent, void *context) {
    // outgoing message was delivered
@@ -9,11 +12,11 @@ void out_sent_handler(DictionaryIterator *sent, void *context) {
    // outgoing message failed
  }
 
+int numberOfItems = 0;
  void in_received_handler(DictionaryIterator *received, void *context) {  
 	 APP_LOG(APP_LOG_LEVEL_DEBUG, "Got some message from phone");
    
 	 Tuple *numberOfItemsTuple = dict_find(received, 1);
-	 int numberOfItems = 0;
 	 
 	 Tuple *currentItemTuple = dict_find(received, 2);
 	 int currentItem = 0;
@@ -21,25 +24,40 @@ void out_sent_handler(DictionaryIterator *sent, void *context) {
 	 if (numberOfItemsTuple) {
 		 numberOfItems = numberOfItemsTuple->value->uint16;
 		 APP_LOG(APP_LOG_LEVEL_DEBUG, "numberOfItemsTuple: %d", numberOfItems); 
-	 }
-	 
+         
+         titles = malloc(numberOfItems * sizeof(char*));
+         subTitles = malloc(numberOfItems * sizeof(char*));
+     }
 	 if (currentItemTuple) {
 		 currentItem = currentItemTuple->value->uint16;
 		 
 
-		 Tuple *titleTuple = dict_find(received, 10+currentItem);
+		 Tuple *titleTuple = dict_find(received, 3);
 		 char *title = "";
-		 Tuple *subTitleTuple = dict_find(received, 11+currentItem);
+		 Tuple *subTitleTuple = dict_find(received, 4);
 		 char *subTitle = "";
 		 
 		 if(titleTuple) {
 			 title = titleTuple->value->cstring;
+             //titles[currentItem] = title;
+             titles[currentItem] = malloc(strlen(title) * sizeof(char*));
+             strcpy(titles[currentItem], title);
 		 }
 		 if(subTitleTuple) {
 			 subTitle = subTitleTuple->value->cstring;
+             //subTitles[currentItem] = subTitle;
+             subTitles[currentItem] = malloc(strlen(subTitle) * sizeof(char*));
+             strcpy(subTitles[currentItem], subTitle);
 		 }
-		 APP_LOG(APP_LOG_LEVEL_DEBUG, "item  %s: %s", title, subTitle); 
+		 APP_LOG(APP_LOG_LEVEL_DEBUG, "item%d  %s: %s", currentItem, title, subTitle); 
 	 }
+	 Tuple *endedTuple = dict_find(received, 5);
+         if(endedTuple) {
+             APP_LOG(APP_LOG_LEVEL_DEBUG, "Last item received! Total %d", numberOfItems); 
+             watchme_data_loaded(numberOfItems, titles, subTitles);
+             //titles = NULL;
+             //subTitles = NULL;
+         }
  }
 
 
