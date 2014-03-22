@@ -74,21 +74,37 @@ var formatDate = function (time) {
 var items = [];
 var latestItems = [];
 var generateItemDetails = function (index) {
-  var data =  [[' '], [' ']];
-if(latestItems[index]) {
+  var data = [
+    [' '],
+    [' ']
+  ];
+  if (latestItems[index]) {
     data = [];
-var item = latestItems[index];
-  data.push(['Channel', item.channelNameLong]);
-  data.push(['Title', item.epgData.tit[0].value]);
-  data.push(['Starts', formatDate(item.epgData.time.strt)]);
-  data.push(['Ends', formatDate(item.epgData.time.end)]);
-  data.push(['Character', item.epgData.chr[0].value]);
-  data.push(['Category', item.epgData.cat[0].value]);
-  data.push(['PG Rating', item.epgData.pg.val[0]+""]);
-  data.push(['Prod. country', item.epgData.prdct.cntr]);
-  data.push(['Production started', item.epgData.prdct.yfst+""]);
-  data.push(['Production ended', item.epgData.prdct.ylst+""]);
-}
+    var item = latestItems[index];
+    //console.log('Detail parsing item: ' + JSON.stringify(item));
+    data.push(['Channel', item.channelNameLong]);
+    if (item.epgData) {
+      data.push(['Title', item.epgData.tit[0].value]);
+      if(item.epgData.time) {
+        data.push(['Starts', formatDate(item.epgData.time.strt)]);
+        data.push(['Ends', formatDate(item.epgData.time.end)]);
+      }
+      if(item.epgData.chr && item.epgData.chr.length>=1) {
+        data.push(['Character', item.epgData.chr[0].value]);
+      }
+      if(item.epgData.cat && item.epgData.cat.length>=1) {
+        data.push(['Category', item.epgData.cat[0].value]);
+      }
+      if(item.epgData.pg && item.epgData.pg.val && item.epgData.pg.val.length>=1) {
+        data.push(['PG Rating', item.epgData.pg.val[0]+""]);
+      }
+      if(item.epgData.prdct) {
+        data.push(['Prod. country', item.epgData.prdct.cntr]);
+        data.push(['Production started', item.epgData.prdct.yfst + ""]);
+        data.push(['Production ended', item.epgData.prdct.ylst + ""]);
+      }
+    }
+  }
   return data;
 };
 var getDataForItem = function (item) {
@@ -146,14 +162,18 @@ var fetchData = function (index) {
           var response = JSON.parse(req.responseText);
           console.log('Got ' + response.totalResults + ' results');
           items = [];
-          latestItems = [];
-          for (var i = 0; i < response.results.length && i < 2; i++) {
+          if (type === 0) {
+            latestItems = [];
+          }
+          for (var i = 0; i < response.results.length && i < 20; i++) {
             items.push(getDataForItem(response.results[i]));
+            if (type === 0) {
               latestItems.push(response.results[i]);
+            }
           }
           if (type == 1) {
             latestChannels = items;
-          } 
+          }
           sendResultsToPebble(items);
 
         } else {

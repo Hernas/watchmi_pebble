@@ -4,8 +4,9 @@
         #include "dataHandler.h"	
 
 
-#define NUM_MENU_SECTIONS 1
+#define NUM_MENU_SECTIONS 2
 #define NUM_FIRST_MENU_ITEMS 2
+#define NUM_SECOND_MENU_ITEMS 1
 
 static Window *window;
 
@@ -17,6 +18,7 @@ static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 
 // Each section is composed of a number of menu items
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
+static SimpleMenuItem second_menu_items[NUM_SECOND_MENU_ITEMS];
 
 // Menu items can optionally have icons
 static GBitmap *menu_icon_image;
@@ -49,8 +51,14 @@ static void window_load(Window *window) {
   };
   first_menu_items[1] = (SimpleMenuItem){
     .title = "Channels",
-    .subtitle = "Browse through channels",
+    .subtitle = "Browse channels",
     .callback = menu_select_callback,
+  };
+    
+  second_menu_items[0] = (SimpleMenuItem){
+    // You should give each menu item a title and callback
+    .title = "MediaHackDay",
+    .subtitle = "B.H., A.S., A.L., M.H., K.K."
   };
 
   // Bind the menu items to the corresponding menu sections
@@ -58,6 +66,11 @@ static void window_load(Window *window) {
     .num_items = NUM_FIRST_MENU_ITEMS,
     .items = first_menu_items,
 	.title = "WATCHMI PEBBLE" 
+  };
+  menu_sections[1] = (SimpleMenuSection){
+    .num_items = NUM_SECOND_MENU_ITEMS,
+    .items = second_menu_items,
+	.title = "CREDITS" 
   };
 
   // Now we prepare to initialize the simple menu layer
