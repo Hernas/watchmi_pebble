@@ -20,33 +20,15 @@ static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 static GBitmap *menu_icon_image;
 
 
-static bool send_to_phone(int key, int index) {
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-  if (iter == NULL) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "null iter");
-    return false;
-  }
 
-  Tuplet tuple = TupletInteger(key, index);
-  dict_write_tuplet(iter, &tuple);
-  dict_write_end(iter);
+int currentlySelected = 0;
 
-  app_message_outbox_send();
-  return true;
-}
 // You can capture when the user selects a menu icon with a menu item select callback
 static void menu_select_callback(int index, void *ctx) {
-  // Here we just change the subtitle to a literal string
-  first_menu_items[index].subtitle = "Loading ...";
-	
-	send_to_phone(0, index);
-
+    currentlySelected = index; 
+  open_advanced_menu(currentlySelected);
 
   layer_mark_dirty(simple_menu_layer_get_layer(simple_menu_layer));
-}
-void watchme_data_loaded(int count, char **titles, char **subTitles) {
-    open_advanced_menu(count, titles, subTitles);
 }
 
 // This initializes the menu upon window load
@@ -57,13 +39,13 @@ static void window_load(Window *window) {
 
   first_menu_items[0] = (SimpleMenuItem){
     // You should give each menu item a title and callback
-    .title = "First Item",
+    .title = "Broadcasts",
+    .subtitle = "Current broadcasts",
     .callback = menu_select_callback,
   };
   first_menu_items[1] = (SimpleMenuItem){
-    .title = "Second Item",
-    // You can also give menu items a subtitle
-    .subtitle = "Here's a subtitle",
+    .title = "Channels",
+    .subtitle = "Browse through channels",
     .callback = menu_select_callback,
   };
 
@@ -71,7 +53,7 @@ static void window_load(Window *window) {
   menu_sections[0] = (SimpleMenuSection){
     .num_items = NUM_FIRST_MENU_ITEMS,
     .items = first_menu_items,
-	.title = "What to do?" 
+	.title = "WATCHMI PEBBLE" 
   };
 
   // Now we prepare to initialize the simple menu layer

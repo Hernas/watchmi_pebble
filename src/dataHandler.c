@@ -2,7 +2,6 @@
     #include "dataHandler.h"
     #include "string.h"
     
-
 void out_sent_handler(DictionaryIterator *sent, void *context) {
    // outgoing message was delivered
  }
@@ -54,7 +53,7 @@ int numberOfItems = 0;
 	 Tuple *endedTuple = dict_find(received, 5);
          if(endedTuple) {
              APP_LOG(APP_LOG_LEVEL_DEBUG, "Last item received! Total %d", numberOfItems); 
-             watchme_data_loaded(numberOfItems, titles, subTitles);
+             watchme_loaded_callback(numberOfItems, titles, subTitles);
              //titles = NULL;
              //subTitles = NULL;
          }

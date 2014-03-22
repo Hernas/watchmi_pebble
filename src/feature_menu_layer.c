@@ -1,4 +1,5 @@
 #include "pebble.h"
+	#include "dataHandler.h"
 
     
     int numberOfItemsInCurrentMenu = 0;
@@ -26,7 +27,11 @@ static uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
   switch (section_index) {
     case 0:
-      return numberOfItemsInCurrentMenu;
+      if(numberOfItemsInCurrentMenu>0) {
+          return numberOfItemsInCurrentMenu;
+      } else {
+          return 1;
+      }
 
     default:
       return 0;
@@ -53,7 +58,11 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
 // This is the menu item draw callback where you specify what each item should look like
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
     int index = cell_index->row;
-   menu_cell_basic_draw(ctx, cell_layer, currentTitles[index], currentSubTitles[index], NULL);
+    if(index<numberOfItemsInCurrentMenu) {
+           menu_cell_basic_draw(ctx, cell_layer, currentTitles[index], currentSubTitles[index], NULL);
+    } else {   
+           menu_cell_basic_draw(ctx, cell_layer, "Loading...", "Please wait", NULL);
+    }
 }
 
 // Here we capture when a user selects a menu item
@@ -101,14 +110,49 @@ void advancedlist_window_unload(Window *window) {
 
   // And cleanup the background
   gbitmap_destroy(menu_background);
+    
+    
+  numberOfItemsInCurrentMenu = 0;
+    currentTitles = NULL;
+    currentSubTitles = NULL; 
 }
 
 
-void open_advanced_menu(int count, char **titles, char **subTitles) {
+static bool send_to_phone(int key, int index) {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  if (iter == NULL) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "null iter");
+    return false;
+  }
+
+  Tuplet tuple = TupletInteger(key, index);
+  dict_write_tuplet(iter, &tuple);
+  dict_write_end(iter);
+
+  app_message_outbox_send();
+  return true;
+}
+
+void watchme_data_loaded(int count, char **titles, char **subTitles) {
+    
   numberOfItemsInCurrentMenu = count;
     currentTitles = titles;
-    currentSubTitles = subTitles;         
-    currentViewTitle = "Test";
+    currentSubTitles = subTitles; 
+    menu_layer_reload_data(menu_layer);
+}
+
+void open_advanced_menu(int type) {   
+    
+    switch(type) {
+        case 0:
+            currentViewTitle = "BROADCASTS";
+        break;
+        case 1:
+            currentViewTitle = "CHANNELS";
+        break;
+    }
+    
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Advanced menu, items: %d", numberOfItemsInCurrentMenu); 
     
   advancedMenuWindow = window_create();
@@ -120,5 +164,9 @@ void open_advanced_menu(int count, char **titles, char **subTitles) {
   });
 
   window_stack_push(advancedMenuWindow, true /* Animated */);
+    
+    
+    watchme_loaded_callback = watchme_data_loaded;
+	send_to_phone(0, type);
 }
 

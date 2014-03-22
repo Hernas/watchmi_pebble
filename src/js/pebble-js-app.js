@@ -1,4 +1,4 @@
-
+var currentType = 0;
 
 Pebble.addEventListener("ready",
   function(e) {
@@ -71,25 +71,34 @@ var minutes = ("0"+date.getMinutes()).substr(0,2);
     return hours + ':' + minutes;
 };
 var getDataForItem = function(item) {
+    var title = '';
+    var subtitle = '';
     //console.log('Parsing item: '+JSON.stringify(item));
-    
-    var subtitle = 'Start: '+formatDate(item.epgData.time.strt);
-    subtitle += ' End: '+formatDate(item.epgData.time.end);
-    return [item.epgData.tit[0].value.substr(0, 15), subtitle];
+    if(currentType===0) {
+        title = item.epgData.tit[0].value;
+        subtitle = 'Start: '+formatDate(item.epgData.time.strt);
+        subtitle += ' End: '+formatDate(item.epgData.time.end);
+    } else if(currentType===1) {
+        title = item.DName.Long.value;
+        subtitle = 'Language: '+item.Lang[0];
+    }
+    if(!title) {
+        title = ' ';
+    }
+    if(!subtitle) {
+        subtitle = ' ';
+    }
+    return [title.substr(0, 20), subtitle];
 };
-var fetchData = function(type) {
-	if(typeof type == "undefined") {
-		type = 0;
-	}
-	
-	var stringType = "primetime";
+var fetchData = function() {
+	var type = currentType;
+	var url  = 'http://hackathon.lab.watchmi.tv/api/example.com/broadcasts/format/json/primetime';
 	switch(type) {
-		case 0:
-			stringType = "primetime";
+		case 1:
+			url = "http://hackathon.lab.watchmi.tv/api/example.com/channels/format/json/";
 			break;
 	}
  var req = new XMLHttpRequest();
-	var url  = 'http://hackathon.lab.watchmi.tv/api/example.com/broadcasts/format/json/'+stringType;
 	console.log('Loading "'+url+'"');
   req.open('GET', url, true);
   req.onload = function(e) {
@@ -99,7 +108,7 @@ var fetchData = function(type) {
         var response = JSON.parse(req.responseText);
 		console.log('Got '+response.totalResults+' results');
           var items = [];
-          for(var i=0; i<response.results.length && i<20; i++) {
+          for(var i=0; i<response.results.length && i<2; i++) {
               items.push(getDataForItem(response.results[i]));
           }
 		sendResultsToPebble(items);
@@ -115,6 +124,7 @@ var fetchData = function(type) {
 Pebble.addEventListener("appmessage",
   function(e) {
     console.log("Received message: " + JSON. stringify (e.payload));
-	fetchData(e.payload[0]);
+    currentType = e.payload[0];
+	fetchData();
   }
 );
