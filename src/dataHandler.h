@@ -1,0 +1,1 @@
+void init_data_handler();
