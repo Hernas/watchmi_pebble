@@ -72,6 +72,9 @@ var minutes = ("0"+date.getMinutes()).substr(0,2);
 };
 
           var items = [];
+                       var generateItemDetails = function(index) {
+                       return [['aaa', 'bbb'], ['ccccc', 'ddddd']];
+                       };
 var getDataForItem = function(item) {
     var title = '';
     var subtitle = '';
@@ -96,12 +99,13 @@ var getDataForItem = function(item) {
 };
 var latestChannels = [];
 var fetchData = function(index) {
+	var type = currentType;
     var id = 0;
-    if(latestChannels[index]) {
+    if(type===0 && latestChannels[index]) {
         id = latestChannels[index][2];
     }
+if(type<=2) {
     console.info('Type: '+currentType+', index: '+index+', id: '+id);
-	var type = currentType;
 	var url  = '';
 	switch(type) {
 		case 0:	
@@ -126,7 +130,7 @@ var fetchData = function(index) {
         var response = JSON.parse(req.responseText);
 		console.log('Got '+response.totalResults+' results');
           items = [];
-          for(var i=0; i<response.results.length && i<2; i++) {
+          for(var i=0; i<response.results.length && i<20; i++) {
               items.push(getDataForItem(response.results[i]));
           }
         if(type==1) {
@@ -138,6 +142,9 @@ var fetchData = function(index) {
     }
   };
   req.send(null);
+} else {
+		sendResultsToPebble(generateItemDetails(index));
+}
 };
 
 

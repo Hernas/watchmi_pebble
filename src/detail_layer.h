@@ -1,1 +1,1 @@
-void open_detail_layer(int index);
+void open_details(int index, char *title);
