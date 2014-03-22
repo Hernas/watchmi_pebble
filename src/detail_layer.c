@@ -111,6 +111,11 @@ void details_window_unload(Window *window) {
   gbitmap_destroy(details_menu_background);
     
     
+    for(int i=0; i<numberOfDetails;i++)
+    {
+        free(currentDetailsTitles[i]);
+        free(currentDetailsSubTitles[i]);
+    }
   numberOfDetails = 0;
     free(currentDetailsTitles);
     free(currentDetailsSubTitles);

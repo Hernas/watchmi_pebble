@@ -112,9 +112,14 @@ void channels_window_unload(Window *window) {
   gbitmap_destroy(channels_menu_background);
     
     
-  numberOfChannels = 0;
+    for(int i=0; i<numberOfChannels;i++)
+    {
+        free(currentChannelsTitles[i]);
+        free(currentChannelsSubTitles[i]);
+    }
     free(currentChannelsTitles);
     free(currentChannelsSubTitles);
+      numberOfChannels = 0;
 }
 
 

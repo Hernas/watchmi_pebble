@@ -112,6 +112,11 @@ void advancedlist_window_unload(Window *window) {
   gbitmap_destroy(menu_background);
     
     
+    for(int i=0; i<numberOfItemsInCurrentMenu;i++)
+    {
+        free(currentTitles[i]);
+        free(currentSubTitles[i]);
+    }
   numberOfItemsInCurrentMenu = 0;
     free(currentTitles);
     free(currentSubTitles);
