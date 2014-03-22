@@ -1,6 +1,8 @@
 	#include "pebble.h"
-	#include "dataHandler.h"
+	#include "channels_layer.h"
     #include "feature_menu_layer.h"
+        #include "dataHandler.h"	
+
 
 #define NUM_MENU_SECTIONS 1
 #define NUM_FIRST_MENU_ITEMS 2
@@ -29,7 +31,7 @@ static void menu_select_callback(int index, void *ctx) {
     if(index==0)  {
         open_advanced_menu(0, "Latest");
     } else if(index==1)  {
-        //open_channels_menu();
+        open_channels();
     }
 }
 
