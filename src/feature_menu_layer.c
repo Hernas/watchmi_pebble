@@ -118,7 +118,7 @@ void advancedlist_window_unload(Window *window) {
 }
 
 
-static bool send_to_phone(int key, int index) {
+static bool send_to_phone(int index) {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   if (iter == NULL) {
@@ -126,8 +126,11 @@ static bool send_to_phone(int key, int index) {
     return false;
   }
 
-  Tuplet tuple = TupletInteger(key, index);
+  Tuplet tuple = TupletInteger(0, 0);
   dict_write_tuplet(iter, &tuple);
+
+  Tuplet tuple2 = TupletInteger(1, index);
+  dict_write_tuplet(iter, &tuple2);
   dict_write_end(iter);
 
   app_message_outbox_send();
@@ -160,6 +163,6 @@ void open_advanced_menu(int id, char *title) {
     
     
     watchme_loaded_callback = watchme_data_loaded;
-	send_to_phone(0, id);
+	send_to_phone(id);
 }
 

@@ -70,9 +70,12 @@ var minutes = ("0"+date.getMinutes()).substr(0,2);
 // will display time in 10:30:23 format
     return hours + ':' + minutes;
 };
+
+          var items = [];
 var getDataForItem = function(item) {
     var title = '';
     var subtitle = '';
+    var id = 0;
     //console.log('Parsing item: '+JSON.stringify(item));
     if(currentType===0) {
         title = item.epgData.tit[0].value;
@@ -81,6 +84,7 @@ var getDataForItem = function(item) {
     } else if(currentType===1) {
         title = item.DName.Long.value;
         subtitle = 'Language: '+item.Lang[0];
+        id = item.id;
     }
     if(!title) {
         title = ' ';
@@ -88,9 +92,15 @@ var getDataForItem = function(item) {
     if(!subtitle) {
         subtitle = ' ';
     }
-    return [title.substr(0, 20), subtitle];
+    return [title.substr(0, 20), subtitle, id];
 };
-var fetchData = function(id) {
+var latestChannels = [];
+var fetchData = function(index) {
+    var id = 0;
+    if(latestChannels[index]) {
+        id = latestChannels[index][2];
+    }
+    console.info('Type: '+currentType+', index: '+index+', id: '+id);
 	var type = currentType;
 	var url  = '';
 	switch(type) {
@@ -115,10 +125,13 @@ var fetchData = function(id) {
       if(req.status == 200) {
         var response = JSON.parse(req.responseText);
 		console.log('Got '+response.totalResults+' results');
-          var items = [];
+          items = [];
           for(var i=0; i<response.results.length && i<2; i++) {
               items.push(getDataForItem(response.results[i]));
           }
+        if(type==1) {
+            latestChannels = items;
+        }
 		sendResultsToPebble(items);
         
       } else { console.log("Error"); }
@@ -133,7 +146,7 @@ Pebble.addEventListener("appmessage",
   function(e) {
     console.log("Received message: " + JSON. stringify (e.payload));
     currentType = e.payload[0];
-    var id = e.payload[1];
-	fetchData(id);
+    var index = e.payload[1];
+	fetchData(index);
   }
 );
