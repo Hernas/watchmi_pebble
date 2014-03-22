@@ -112,8 +112,8 @@ void details_window_unload(Window *window) {
     
     
   numberOfDetails = 0;
-    currentDetailsTitles = NULL;
-    currentDetailsSubTitles = NULL; 
+    free(currentDetailsTitles);
+    free(currentDetailsSubTitles);
 }
 
 

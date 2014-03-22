@@ -113,8 +113,8 @@ void advancedlist_window_unload(Window *window) {
     
     
   numberOfItemsInCurrentMenu = 0;
-    currentTitles = NULL;
-    currentSubTitles = NULL; 
+    free(currentTitles);
+    free(currentSubTitles);
 }
 
 

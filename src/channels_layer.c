@@ -113,8 +113,8 @@ void channels_window_unload(Window *window) {
     
     
   numberOfChannels = 0;
-    currentChannelsTitles = NULL;
-    currentChannelsSubTitles = NULL; 
+    free(currentChannelsTitles);
+    free(currentChannelsSubTitles);
 }
 
 
