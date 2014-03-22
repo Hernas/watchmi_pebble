@@ -26,9 +26,11 @@ int currentlySelected = 0;
 // You can capture when the user selects a menu icon with a menu item select callback
 static void menu_select_callback(int index, void *ctx) {
     currentlySelected = index; 
-  open_advanced_menu(currentlySelected);
-
-  layer_mark_dirty(simple_menu_layer_get_layer(simple_menu_layer));
+    if(index==0)  {
+        open_advanced_menu(0, "Latest");
+    } else if(index==1)  {
+        //open_channels_menu();
+    }
 }
 
 // This initializes the menu upon window load

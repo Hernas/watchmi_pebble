@@ -1,0 +1,1 @@
+void open_detail_layer(int index);

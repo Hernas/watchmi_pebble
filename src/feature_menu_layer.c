@@ -1,6 +1,7 @@
 #include "pebble.h"
-	#include "dataHandler.h"
-
+	#include "dataHandler.h"	
+    #include "detail_layer.h"
+int currentId;
     
     int numberOfItemsInCurrentMenu = 0;
 char **currentTitles;
@@ -67,8 +68,7 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 
 // Here we capture when a user selects a menu item
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-  
-
+    open_detail_layer(cell_index->row);
 }
 
 // This initializes the menu upon window load
@@ -142,16 +142,9 @@ void watchme_data_loaded(int count, char **titles, char **subTitles) {
     menu_layer_reload_data(menu_layer);
 }
 
-void open_advanced_menu(int type) {   
-    
-    switch(type) {
-        case 0:
-            currentViewTitle = "BROADCASTS";
-        break;
-        case 1:
-            currentViewTitle = "CHANNELS";
-        break;
-    }
+void open_advanced_menu(int id, char *title) {   
+    currentId = id;
+    currentViewTitle = title;
     
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Advanced menu, items: %d", numberOfItemsInCurrentMenu); 
     
@@ -167,6 +160,6 @@ void open_advanced_menu(int type) {
     
     
     watchme_loaded_callback = watchme_data_loaded;
-	send_to_phone(0, type);
+	send_to_phone(0, id);
 }
 

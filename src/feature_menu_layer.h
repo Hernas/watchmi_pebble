@@ -1,1 +1,1 @@
-void open_advanced_menu(int type);
+void open_advanced_menu(int id, char *title);

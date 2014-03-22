@@ -90,10 +90,18 @@ var getDataForItem = function(item) {
     }
     return [title.substr(0, 20), subtitle];
 };
-var fetchData = function() {
+var fetchData = function(id) {
 	var type = currentType;
-	var url  = 'http://hackathon.lab.watchmi.tv/api/example.com/broadcasts/format/json/primetime';
+	var url  = '';
 	switch(type) {
+		case 0:	
+            if(!id) {
+                id = 'primetime';
+            } else {
+                id = 'channel/'+id;
+            }
+            url  = 'http://hackathon.lab.watchmi.tv/api/example.com/broadcasts/format/json/'+id;
+			break;
 		case 1:
 			url = "http://hackathon.lab.watchmi.tv/api/example.com/channels/format/json/";
 			break;
@@ -125,6 +133,7 @@ Pebble.addEventListener("appmessage",
   function(e) {
     console.log("Received message: " + JSON. stringify (e.payload));
     currentType = e.payload[0];
-	fetchData();
+    var id = e.payload[1];
+	fetchData(id);
   }
 );
